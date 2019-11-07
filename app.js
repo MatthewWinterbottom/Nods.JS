@@ -50,7 +50,7 @@ people.forEach(element => {
 // Meaning the file will be read before any code beneath
 // Is exucuted
 
-// async read a file, 
+// read a file, 
 fs.readFile('./readMe.txt', 'utf8', (err, data) => {
     //fs.writeFile('writeMe.txt', data)
     fs.writeFileSync('./writeMe.txt', data);
@@ -66,7 +66,24 @@ console.log('this is logged before the function above executes')
 
 //fs.writeFileSync('writeMe.txt', readMe)
 
+// Deleting a file
+//fs.unlinkSync('./writeMe.txt')
 
 
+// Creating and removing directories
+
+// Create directory synchronously
+//fs.mkdirSync('./stuffDir')
+
+// Create directory asynchronously
 
 
+// Create directory (as long as it doesn't exist), read file, write file with data
+// From the read file.
+fs.mkdir('./stuffDir', () => { 
+    fs.readFile('readMe.txt', 'utf8', (err, data) => {
+        fs.writeFileSync('./stuffDir/writeMe.txt', data);
+    });
+});
+
+// Note: We can not remove a directory that isn't empty
