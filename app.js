@@ -1,89 +1,39 @@
-var stuff = require('./stuff');
-var events = require('events');
+var http = require('http');
 var fs = require('fs');
 
 
-// Testing using imported modules
-var res = stuff.counter(['Matt', 'Aaron', 'Ned']);
+/*
+myReadStream.on('data', (chunk) => {
 
-//console.log(res);
+    // When we're reading the stream, it will send over chunk, when the chunk is received it emits
+    // And 'data' event. So we can listen out for the event using the 'data' event type.
 
-// Testing event emitting
-var myEmitter = new events.EventEmitter();
+    myWriteStream.write(chunk);
+})
+*/
 
-myEmitter.on('someEvent', function(msg){
-    console.log(msg);
-});
 
-//myEmitter.emit('someEvent', 'The event was emitted.');
 
-// Testing event emitting on custom objects
+ var server = http.createServer((req, res) => {
 
-// Person class
-class Person extends events.EventEmitter{
-    constructor(name) {
-        super();
-        this.name = name;
+    console.log(`request was made from : ${req.url}`)
+
+    if (req.url === '/' || req.url === '/home') {
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        fs.createReadStream(__dirname + '/index.html').pipe(res);
+    } else if (req.url === '/contact-us') {
+        res.writeHead(200, {'Content_Type': 'text/html'});
+        fs.createReadStream(__dirname + '/contact.html').pipe(res);
+    } else if (req.url === '/api') {
+
+        var employees = [{name: 'Tim', age: 21}, {name: 'clough-meister-general', age: 30}]
+        res.writeHead(200, {'Content_Type': 'application/json'});
+        res.end(JSON.stringify(employees))
+    } else {
+        res.writeHead(404, 'text/html');
+        fs.createReadStream(__dirname + '/404.html').pipe(res);
     }
-}
-
-// Create Person objects
-let james = new Person('James');
-let mary = new Person('Mary');
-
-// Create arroy of Person Objects
-let people = [james, mary]
-
-// Attach event emitter to each person
-people.forEach(element => {
-    element.on('speak', msg => {
-        console.log(element.name + 'said: ' + msg)
-    })
 });
 
-// Emit a speak event for James
-//james.emit('speak', 'hey dudes');
-
-// Reading and writing files using fs
-
-// This is synchronous method to read the file
-// Meaning the file will be read before any code beneath
-// Is exucuted
-
-// read a file, 
-fs.readFile('./readMe.txt', 'utf8', (err, data) => {
-    //fs.writeFile('writeMe.txt', data)
-    fs.writeFileSync('./writeMe.txt', data);
-    console.log('File has been written');
-});
-
-console.log('this is logged before the function above executes')
-
-//sync
-//readMe = fs.readFileSync('./readMe.txt', 'utf8')
-
-// Writing a file, again synchronous
-
-//fs.writeFileSync('writeMe.txt', readMe)
-
-// Deleting a file
-//fs.unlinkSync('./writeMe.txt')
-
-
-// Creating and removing directories
-
-// Create directory synchronously
-//fs.mkdirSync('./stuffDir')
-
-// Create directory asynchronously
-
-
-// Create directory (as long as it doesn't exist), read file, write file with data
-// From the read file.
-fs.mkdir('./stuffDir', () => { 
-    fs.readFile('readMe.txt', 'utf8', (err, data) => {
-        fs.writeFileSync('./stuffDir/writeMe.txt', data);
-    });
-});
-
-// Note: We can not remove a directory that isn't empty
+server.listen(3000, '127.0.0.1');
+console.log('Now listening to port 3000');
